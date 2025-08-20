@@ -48,27 +48,12 @@
       border-radius: 6px;
       cursor: pointer;
     }
-    .house {
-  position: absolute;
-  bottom: 50px;
-  left: 150px;
-  width: 50px;
-  height: 50px;
-  background: brown;
-  border: 2px solid #333;
-  cursor: pointer;
-  transition: transform 0.2s, background 0.2s;
-}
-.house:hover {
-  background: orange;
-  transform: scale(1.2);
-}
+ 
   </style>
 </head>
 <body>
   <h1>Catch the Orbs 🎮</h1>
   <div id="game">
-    <div id="house" class="house"></div>
     <div id="orb" class="orb"></div>
     <div id="player" class="player"></div>
   </div>
@@ -80,6 +65,8 @@
     const orb = document.getElementById("orb");
     const info = document.getElementById("info");
     const restartBtn = document.getElementById("restart");
+    const game = document.getElementById("game");
+
 
     let playerX = 170;
     let orbX = Math.random() * 380;
@@ -88,10 +75,15 @@
     let lives = 3;
     let gameOver = false;
 
+    game.addEventListener("mousemove", (e) => {
+  const rect = game.getBoundingClientRect();
+  let mouseX = e.clientX - rect.left;
+  let mouseY = e.clientY - rect.top;
+
     function update() {
       if (gameOver) return;
 
-      orbY += 5;
+      orbY += 2;
       if (orbY > 380) {
         if (orbX > playerX - 40 && orbX < playerX + 60) {
           score++;
@@ -127,6 +119,9 @@
   if (e.key === "d" || e.key === "D") playerX = Math.min(340, playerX + 20);
 });
 
+  playerX = Math.max(0, Math.min(mouseX - 30, 340)); // player width is 60
+  playerY = Math.max(0, Math.min(mouseY - 5, 390));
+
     restartBtn.addEventListener("click", () => {
       score = 0;
       lives = 3;
@@ -140,6 +135,7 @@
 
     draw();
     gameLoop();
+    
   </script>
 </body>
 </html>
