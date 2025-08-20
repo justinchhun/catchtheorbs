@@ -74,6 +74,7 @@
     let score = 0;
     let lives = 3;
     let gameOver = false;
+    let animationId;
 
     game.addEventListener("mousemove", (e) => {
   const rect = game.getBoundingClientRect();
@@ -102,6 +103,11 @@
       draw();
     }
 
+    function gameLoop() {
+  update();
+  animationId = requestAnimationFrame(gameLoop);
+}
+
     function draw() {
       player.style.left = playerX + "px";
       orb.style.left = orbX + "px";
@@ -122,16 +128,17 @@
   playerX = Math.max(0, Math.min(mouseX - 30, 340)); // player width is 60
   playerY = Math.max(0, Math.min(mouseY - 5, 390));
 
-    restartBtn.addEventListener("click", () => {
-      score = 0;
-      lives = 3;
-      gameOver = false;
-      orbY = 0;
-      orbX = Math.random() * 380;
-      restartBtn.style.display = "none";
-      draw();
-      gameLoop();
-    });
+  restartBtn.addEventListener("click", () => {
+  cancelAnimationFrame(animationId); // stops previous loop
+  score = 0;
+  lives = 3;
+  gameOver = false;
+  orbY = 0;
+  orbX = Math.random() * 380;
+  draw();
+  gameLoop();
+});
+
 
     draw();
     gameLoop();
