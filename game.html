@@ -30,7 +30,6 @@
     }
     .player {
       position: absolute;
-      bottom: 10px;
       width: 60px;
       height: 10px;
       background: blue;
@@ -48,7 +47,6 @@
       border-radius: 6px;
       cursor: pointer;
     }
- 
   </style>
 </head>
 <body>
@@ -61,14 +59,14 @@
   <button id="restart" style="display:none;">Restart</button>
 
   <script>
+    const game = document.getElementById("game");
     const player = document.getElementById("player");
     const orb = document.getElementById("orb");
     const info = document.getElementById("info");
     const restartBtn = document.getElementById("restart");
-    const game = document.getElementById("game");
-
 
     let playerX = 170;
+    let playerY = 380;
     let orbX = Math.random() * 380;
     let orbY = 0;
     let score = 0;
@@ -76,40 +74,35 @@
     let gameOver = false;
     let animationId;
 
-    game.addEventListener("mousemove", (e) => {
-  const rect = game.getBoundingClientRect();
-  let mouseX = e.clientX - rect.left;
-  let mouseY = e.clientY - rect.top;
-
     function update() {
       if (gameOver) return;
 
+      // Slower orb movement
       orbY += 2;
-      if (orbY > 380) {
-        if (orbX > playerX - 40 && orbX < playerX + 60) {
-          score++;
-        } else {
-          lives--;
-          if (lives <= 0) {
-            gameOver = true;
-            info.textContent = `Game Over! Final Score: ${score}`;
-            restartBtn.style.display = "inline-block";
-            return;
-          }
-        }
+
+      // Collision detection with player
+      if (orbY + 20 >= playerY && orbY <= playerY + 10 &&
+          orbX + 20 >= playerX && orbX <= playerX + 60) {
+        score++;
         orbY = 0;
         orbX = Math.random() * 380;
+      } else if (orbY > 400) {
+        lives--;
+        orbY = 0;
+        orbX = Math.random() * 380;
+        if (lives <= 0) {
+          gameOver = true;
+          info.textContent = `Game Over! Final Score: ${score}`;
+          restartBtn.style.display = "inline-block";
+        }
       }
+
       draw();
     }
 
-    function gameLoop() {
-  update();
-  animationId = requestAnimationFrame(gameLoop);
-}
-
     function draw() {
       player.style.left = playerX + "px";
+      player.style.top = playerY + "px";
       orb.style.left = orbX + "px";
       orb.style.top = orbY + "px";
       info.textContent = `Score: ${score} | Lives: ${lives}`;
@@ -117,32 +110,45 @@
 
     function gameLoop() {
       update();
-      requestAnimationFrame(gameLoop);
+      animationId = requestAnimationFrame(gameLoop);
     }
 
-   window.addEventListener("keydown", (e) => {
-  if (e.key === "a" || e.key === "A") playerX = Math.max(0, playerX - 20);
-  if (e.key === "d" || e.key === "D") playerX = Math.min(340, playerX + 20);
-});
+    // Keyboard controls W/A/S/D
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "a" || e.key === "A") playerX = Math.max(0, playerX - 20);
+      if (e.key === "d" || e.key === "D") playerX = Math.min(340, playerX + 20);
+      if (e.key === "w" || e.key === "W") playerY = Math.max(0, playerY - 20);
+      if (e.key === "s" || e.key === "S") playerY = Math.min(390, playerY + 20);
+      draw();
+    });
 
-  playerX = Math.max(0, Math.min(mouseX - 30, 340)); // player width is 60
-  playerY = Math.max(0, Math.min(mouseY - 5, 390));
+    // Mouse hover control
+    game.addEventListener("mousemove", (e) => {
+      const rect = game.getBoundingClientRect();
+      let mouseX = e.clientX - rect.left;
+      let mouseY = e.clientY - rect.top;
+      playerX = Math.max(0, Math.min(mouseX - 30, 340)); // center on cursor
+      playerY = Math.max(0, Math.min(mouseY - 5, 390));
+      draw();
+    });
 
-  restartBtn.addEventListener("click", () => {
-  cancelAnimationFrame(animationId); // stops previous loop
-  score = 0;
-  lives = 3;
-  gameOver = false;
-  orbY = 0;
-  orbX = Math.random() * 380;
-  draw();
-  gameLoop();
-});
-
+    // Restart button
+    restartBtn.addEventListener("click", () => {
+      cancelAnimationFrame(animationId); // stop previous loop
+      score = 0;
+      lives = 3;
+      playerX = 170;
+      playerY = 380;
+      orbX = Math.random() * 380;
+      orbY = 0;
+      gameOver = false;
+      restartBtn.style.display = "none";
+      draw();
+      gameLoop();
+    });
 
     draw();
     gameLoop();
-    
   </script>
 </body>
 </html>
