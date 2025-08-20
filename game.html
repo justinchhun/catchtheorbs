@@ -48,11 +48,27 @@
       border-radius: 6px;
       cursor: pointer;
     }
+    .house {
+  position: absolute;
+  bottom: 50px;
+  left: 150px;
+  width: 50px;
+  height: 50px;
+  background: brown;
+  border: 2px solid #333;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+.house:hover {
+  background: orange;
+  transform: scale(1.2);
+}
   </style>
 </head>
 <body>
   <h1>Catch the Orbs 🎮</h1>
   <div id="game">
+    <div id="house" class="house"></div>
     <div id="orb" class="orb"></div>
     <div id="player" class="player"></div>
   </div>
@@ -106,10 +122,10 @@
       requestAnimationFrame(gameLoop);
     }
 
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowLeft") playerX = Math.max(0, playerX - 20);
-      if (e.key === "ArrowRight") playerX = Math.min(340, playerX + 20);
-    });
+   window.addEventListener("keydown", (e) => {
+  if (e.key === "a" || e.key === "A") playerX = Math.max(0, playerX - 20);
+  if (e.key === "d" || e.key === "D") playerX = Math.min(340, playerX + 20);
+});
 
     restartBtn.addEventListener("click", () => {
       score = 0;
